@@ -1,0 +1,89 @@
+{
+  "schema": "signed-webhook-copied-source-public-summary/v1",
+  "observed_at_utc": "2026-10-09T14:16:29.356006+00:00",
+  "runtime": {
+    "python": "3.13.16",
+    "sqlite": "3.53.1",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+  },
+  "runtime_dependencies": [],
+  "source_commit": "dc4aed97b92dd04afc6c62428fe936bae7251b6b",
+  "sdk_version": "1.1.0",
+  "sdk_package_files": 4,
+  "original_sdk_tests_passed": 15,
+  "unchanged_copy_sdk_tests_passed": 15,
+  "local_product_tests_passed": 26,
+  "fresh_installed_wheel_product_tests_passed": 26,
+  "sqlite_test_helper_resource_warnings": {
+    "before": 24,
+    "after": 0,
+    "product_storage_changed": false
+  },
+  "installed_wheel": {
+    "verifier_sha256": "b701369347325085aea04be18a2a6f441ae40a69dc920fd9b3f29b125c15a0ff",
+    "external_sdk_available": false,
+    "observed_runtime_calls": {
+      "verify": 5,
+      "sign": 7
+    },
+    "payload_readback": [
+      {
+        "wheel_member": "signed_webhook_inbox/_vendor/standardwebhooks/webhooks.py",
+        "sha256": "b701369347325085aea04be18a2a6f441ae40a69dc920fd9b3f29b125c15a0ff",
+        "byte_equal_upstream_copy_wheel_installed": true
+      },
+      {
+        "wheel_member": "signed_webhook_inbox/_vendor/standardwebhooks/__init__.py",
+        "sha256": "708e518301521cd7474fbc77c3816290445fec2dbe8e443895bb3d37302889c8",
+        "byte_equal_upstream_copy_wheel_installed": true
+      },
+      {
+        "wheel_member": "signed_webhook_inbox/_vendor/standardwebhooks/py.typed",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "byte_equal_upstream_copy_wheel_installed": true
+      },
+      {
+        "wheel_member": "signed_webhook_inbox/_vendor/standardwebhooks/LICENSE",
+        "sha256": "5ec8c7b26b64d881a6706617bed25c049f97f2f35de034c756de8546fd6dbe27",
+        "byte_equal_upstream_copy_wheel_installed": true
+      },
+      {
+        "wheel_member": "signed_webhook_inbox/_vendor/standardwebhooks/exceptions.py",
+        "sha256": "43c526283a66b8ebff0bf796150c904ad8cd2b8639babb72655aab15beebaf34",
+        "byte_equal_upstream_copy_wheel_installed": true
+      }
+    ]
+  },
+  "quality": {
+    "ruff_check": "passed",
+    "ruff_format": "passed",
+    "build": "passed",
+    "console_demo": "passed",
+    "fresh_pip_check": "passed"
+  },
+  "limits": [
+    "Local Python development HTTP server, fixed loopback, no TLS, unbounded request threads.",
+    "One symmetric key; no key rotation manager or remote delivery adapter.",
+    "Receipt deduplication does not implement exactly-once business side effects.",
+    "Crash durability depends on filesystem/hardware honoring synchronization.",
+    "Python 3.11 and GitHub CI not executed; no production certification, customer use, demand, income, or publication."
+  ],
+  "remote_ci_executed": false,
+  "customer_deployment": false,
+  "final_staged_wheel_verification": {
+    "status": "passed",
+    "install_completed_before_test_start": true,
+    "product_tests_passed": 26,
+    "resource_warnings": 0,
+    "console_demo": "passed",
+    "pip_check": "passed",
+    "runtime_files_stage_wheel_installed_bytes_match": 12,
+    "external_sdk_available": false,
+    "observed_runtime_calls": {
+      "verify": 5,
+      "sign": 7
+    },
+    "wheel_sha256": "2b20cdc05059469e2a084eab2fbbc69d5f3055035f97d1245c47cde770757717",
+    "historical_archive_and_test_order_findings_closed": true
+  }
+}

@@ -1,0 +1,7 @@
+Recorded source comparison: original SDK 15 passed; unchanged copy 15 passed.
+Local inbox 26 passed, zero ResourceWarnings after test-helper closure.
+Fresh installed-wheel inbox 26 passed; console demo and pip check passed.
+Copied SDK/license bytes match upstream, source, final wheel and installed files.
+Observed copied verifier/signing calls: 5 / 7; external SDK absent.
+Runtime Python 3.13.16 / SQLite 3.53.1, Linux under WSL2.
+See VERIFICATION.md and docs/verification.json for scope and limits.

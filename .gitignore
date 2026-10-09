@@ -1,0 +1,11 @@
+.venv/
+.smoke-venv/
+.reference/
+__pycache__/
+*.egg-info/
+.ruff_cache/
+dist/
+build/
+*.sqlite3*
+.cache/
+.local-tools/

@@ -1,0 +1,10 @@
+include REFERENCES.md THIRD_PARTY_NOTICES.md
+include SOURCE_MANIFEST.json
+recursive-include upstream *
+recursive-exclude upstream *.pyc
+recursive-include tools *.py
+include VERIFICATION.md RESEARCH.md
+recursive-include docs *.md *.txt *.json
+recursive-include examples *.json
+recursive-include tests *.py
+recursive-include .github *.yml

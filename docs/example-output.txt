@@ -1,0 +1,8 @@
+valid: 200 stored
+retry: 200 duplicate
+tampered: 401 verification_failed
+stale: 401 verification_failed
+conflict: 409 conflict
+events: 1
+duplicate_count: 1
+sha256: 1858de5efce540080ac8d1bff5d7d72501b0c8222ebd4573328de36d095f879b
