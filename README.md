@@ -12,6 +12,14 @@ and read-only inspection. It is a local integration reference with no external
 runtime dependencies. Its source lineage is recorded in
 [SOURCE_MANIFEST.json](SOURCE_MANIFEST.json).
 
+[Demo and setup](#try-the-complete-scenario) · [Persistent CLI](#run-a-persistent-inbox) · [Request contract](#request-contract) · [Checks](#verify-the-contracts) · [Source and limits](#design-and-limits)
+
+The [receiver](src/signed_webhook_inbox/server.py) verifies requests, the
+[storage layer](src/signed_webhook_inbox/storage.py) commits or deduplicates them,
+and the [CLI](src/signed_webhook_inbox/cli.py) runs the demo and local server.
+See [architecture](docs/architecture.md), [source provenance](REFERENCES.md),
+[tests](tests/) and [verification](VERIFICATION.md) for the corresponding boundaries.
+
 ## Try the complete scenario
 
 Python 3.11 or newer and SQLite 3.37 or newer are required. The [verification record](docs/verification.json)
