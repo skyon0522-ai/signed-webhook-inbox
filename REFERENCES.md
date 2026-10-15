@@ -81,6 +81,24 @@ Its remote forwarding, transformations, plugins, and adapters remain outside
 this local slice. The original candidate's `.reference` files and prior receipt
 remain protected and are not runtime components of this new package.
 
+## Linux workflow and offline view references (2026-10-15)
+
+The inspected companion implementations were `ops-daily-report`'s
+`src/ops_daily_report/cli.py`, `html_report.py`, README and `docs/DESIGN.md`, and
+`pii-redaction-review`'s `redaction_cli.py` and README. The inbox adopts their
+installed-command first run, retained synthetic outputs, summary counts before
+details, escaped metadata, labeled horizontal table scrolling, keyboard focus,
+print treatment and self-contained offline view. The static report needs no
+JavaScript or new rendering dependency. Those references informed the structure;
+no third-party parser or redaction implementation is included here.
+
+The existing `Inbox.inspect()` query supplies report metadata. It does not select
+raw bodies or signing material. The original demo keeps its no-flag temporary
+behavior; `--output-dir` selects a new retained directory and uses the same public
+synthetic body already embedded in the installed package. The HTTP server, schema,
+signature verifier and signing path are unchanged. New reports use exclusive file
+creation, and retained demos refuse an existing directory before starting HTTP.
+
 ## Reproduce and understand the limits
 
 Install `.[dev]` in a fresh environment, then run:
@@ -102,6 +120,9 @@ download their pinned dependencies.
 Python's development HTTP server, unbounded request threads, loopback HTTP,
 one key, indefinite event retention, and filesystem-dependent crash durability
 remain limits. Receipt deduplication does not provide exactly-once business side
-effects. CI, Python 3.11 execution, external integrations, customer use, paid
+effects. The base revision `a1e2cfa9dab431736bc4d38bb5febb649cc1c8e7` has a
+[successful GitHub contracts run](https://github.com/skyon0522-ai/signed-webhook-inbox/actions/runs/38060147600),
+observed on 2026-10-15 JST. The new local candidate has not run remotely.
+Local Python 3.11 execution, external integrations, customer use, paid
 demand, revenue, and production security certification are unverified. No public
 or cloud changes are part of this source-composition stage.

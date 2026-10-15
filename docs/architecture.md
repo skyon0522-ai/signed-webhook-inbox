@@ -33,6 +33,27 @@ Rejected requests and conflicts are not persisted. This is deliberately a
 receipt audit, not an exhaustive attempt log. Signatures and signing secrets
 are not stored or printed. Inspection exposes metadata without raw payloads.
 
+## Offline metadata view
+
+`report --db PATH --html NEW_FILE` calls the same read-only `Inbox.inspect()`
+query as the JSON CLI. It shows stored event count, accepted identical retry
+count and their sum as accepted receipts. Rejected and conflicting attempts are
+not counted because they are not stored. Each event shows its type, byte size,
+retry count and first receipt time; expandable details show the hash, signed
+timestamp, last accepted receipt time and verifier version.
+
+The report is a static snapshot with no scripts or external assets. Every
+database-derived string is HTML-escaped. It omits payloads, keys, signatures and
+database paths, while event IDs and types still require review before sharing.
+Exclusive output creation prevents replacing an existing file. A missing input
+database fails before output creation; the report never initializes a database.
+
+The optional retained demo uses a caller-selected new directory for the database,
+exact synthetic fixture, JSON inspection, HTML report and outcome transcript. It
+stops its temporary loopback listener before writing the metadata exports. The
+no-flag demo still removes its temporary directory on exit. Interrupted retained
+demos can leave partial local outputs; choose another new directory to rerun.
+
 ## Concurrency and recovery
 
 Each HTTP request gets its own SQLite connection. `BEGIN IMMEDIATE` serializes

@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from .demo import run_demo, send, signed_headers
+from .html_report import write_report
 from .server import ID_PATTERN, MAX_BODY_BYTES, InboxServer, verifier_for
 from .storage import Inbox
 
@@ -30,17 +31,25 @@ def main(argv: list[str] | None = None) -> int:
         "inspect", help="read event metadata without changing the database"
     )
     inspect.add_argument("--db", type=Path, required=True)
+    report = commands.add_parser("report", help="write a new offline HTML metadata snapshot")
+    report.add_argument("--db", type=Path, required=True)
+    report.add_argument("--html", type=Path, required=True, help="new HTML file; parent must exist")
     sender = commands.add_parser("send", help="send a signed JSON fixture to loopback")
     sender.add_argument("--port", type=port_number, default=8099)
     sender.add_argument("--id", required=True)
     sender.add_argument("--payload-file", type=Path, required=True)
-    commands.add_parser("demo", help="run valid/retry/tamper/stale/conflict cases locally")
+    demo = commands.add_parser("demo", help="run valid/retry/tamper/stale/conflict cases locally")
+    demo.add_argument("--output-dir", type=Path, help="retain synthetic outputs in a new directory")
     args = parser.parse_args(argv)
     try:
         if args.command == "demo":
-            return run_demo()
+            return run_demo(args.output_dir)
         if args.command == "inspect":
             print(json.dumps(Inbox(args.db).inspect(), indent=2))
+            return 0
+        if args.command == "report":
+            write_report(Inbox(args.db), args.html)
+            print(f"HTML report: {args.html.resolve()}")
             return 0
         secret = os.environ.get("WEBHOOK_SECRET", "")
         verifier_for(secret)
@@ -65,6 +74,8 @@ def main(argv: list[str] | None = None) -> int:
             except KeyboardInterrupt:
                 pass
         return 0
+    except FileExistsError:
+        print("error: output already exists; choose a new file or directory", file=sys.stderr)
     except (ValueError, UnicodeError):
         print("error: invalid configuration or fixture", file=sys.stderr)
     except (sqlite3.Error, OSError):

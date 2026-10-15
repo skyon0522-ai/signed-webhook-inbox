@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="light"><title>Signed Webhook Inbox — receipt report</title>
+<style>
+:root{--ink:#172c3e;--muted:#516678;--line:#d6e0e6;--brand:#16615c;--paper:#fff;--bg:#f3f6f8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,sans-serif}
+main{max-width:1120px;margin:auto;padding:40px 28px 60px}h1{font-size:clamp(28px,4vw,40px);line-height:1.2;margin:8px 0 16px}h2{font-size:23px;margin:0 0 12px}
+p{margin:0 0 16px}.eyebrow{color:var(--brand);font-weight:700;letter-spacing:.07em;font-size:14px}.intro{max-width:76ch;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0}
+.stat,section{background:var(--paper);border:1px solid var(--line);border-radius:10px}.stat{padding:20px}.stat strong{display:block;font-size:32px;line-height:1.2}.stat span{display:block;margin-top:8px;color:var(--muted)}
+section{padding:24px;margin-bottom:24px}.table-scroll{overflow-x:auto}table{width:100%;min-width:730px;border-collapse:collapse;text-align:left}th,td{padding:14px 12px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#edf3f5;font-size:14px}td:first-child{width:48%}td strong,td span{display:block;overflow-wrap:anywhere}td span{color:var(--muted)}.number{text-align:right;font-variant-numeric:tabular-nums}
+summary{cursor:pointer;min-height:44px;color:var(--brand);padding-top:10px}summary:focus-visible,.table-scroll:focus-visible{outline:3px solid var(--brand);outline-offset:3px}dl{margin:8px 0 0;font-size:14px}dt{color:var(--muted);margin-top:8px}dd{margin:0;overflow-wrap:anywhere}code{font:14px/1.6 ui-monospace,monospace;overflow-wrap:anywhere}footer{color:var(--muted);font-size:14px}
+@media(max-width:700px){main{padding:24px 16px 40px}section{padding:16px}.stats{gap:10px}.stat{padding:12px}.stat strong{font-size:27px}.stat span{font-size:14px}}
+@media(max-width:420px){.stats{grid-template-columns:1fr}.stat{display:flex;align-items:center;gap:16px}.stat span{margin:0}}
+@media print{body{background:white}main{max-width:none;padding:0}section{padding:12px;border:0}.table-scroll{overflow:visible}table{min-width:0}th,td{padding:8px 6px}.stats{gap:8px}.stat{padding:12px}details{break-inside:avoid}}
+</style></head><body><main>
+<header><p class="eyebrow">LOCAL RECEIPT REVIEW</p><h1>Signed Webhook Inbox</h1>
+<p class="intro">Review accepted event IDs, exact-payload fingerprints and retry counts in a read-only snapshot. A stored receipt confirms acceptance; it does not confirm that a business action ran.</p></header>
+<div class="stats" aria-label="Accepted receipt summary">
+<div class="stat"><strong>1</strong><span>Stored events</span></div>
+<div class="stat"><strong>1</strong><span>Identical retries</span></div>
+<div class="stat"><strong>2</strong><span>Accepted receipts</span></div></div>
+<section aria-labelledby="events-title"><h2 id="events-title">Stored events</h2>
+<p class="intro" id="event-note">Only accepted events and identical retries appear here. Rejected requests and conflicting payloads are not recorded.</p>
+<div class="table-scroll" role="region" aria-label="Event metadata, scroll horizontally for all columns" tabindex="0"><table aria-describedby="event-note">
+<thead><tr><th scope="col">Event ID / type</th><th scope="col" class="number">Payload bytes</th><th scope="col" class="number">Identical retries</th><th scope="col">First accepted receipt (UTC)</th></tr></thead>
+<tbody><tr>
+<td><strong>msg_invoice_042</strong><span>invoice.paid</span>
+<details><summary>Receipt details</summary><dl>
+<dt>Payload SHA-256</dt><dd><code>1858de5efce540080ac8d1bff5d7d72501b0c8222ebd4573328de36d095f879b</code></dd>
+<dt>First signed timestamp (Unix seconds)</dt><dd>1791999866</dd>
+<dt>Last accepted receipt (UTC)</dt><dd>2026-10-14T17:44:26+00:00</dd>
+<dt>Verifier</dt><dd>standardwebhooks/1.1.0:v1</dd></dl></details></td>
+<td class="number">70</td><td class="number">1</td>
+<td>2026-10-14T17:44:26+00:00</td></tr></tbody></table></div></section>
+<section aria-labelledby="scope-title"><h2 id="scope-title">Snapshot and sharing notes</h2>
+<p>This file does not refresh. Generate a new report after further requests. Receipt details include the first signed attempt timestamp, last accepted receipt, payload SHA-256 and verifier version.</p>
+<p>Raw payloads, signatures, signing secrets and database paths are omitted. Metadata such as event IDs and types can still be sensitive; review the file before sharing. A fingerprint does not encrypt or conceal its input.</p></section>
+<footer>Offline HTML · no scripts or external assets · no data upload</footer>
+</main></body></html>

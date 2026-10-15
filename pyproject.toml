@@ -28,7 +28,7 @@ where = ["src"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["upstream", "src/signed_webhook_inbox/_vendor", ".local-tools"]
+extend-exclude = ["upstream", "src/signed_webhook_inbox/_vendor", ".local-tools", "build", "dist"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]

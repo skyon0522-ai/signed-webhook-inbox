@@ -1,0 +1,66 @@
+{
+  "schema": "signed-webhook-linux-workflow/v1",
+  "observed_date_jst": "2026-10-15",
+  "runtime": {
+    "python": "3.12.3",
+    "sqlite": "3.45.1",
+    "os": "Ubuntu 24.04 / WSL2 x86_64"
+  },
+  "base_commit": "a1e2cfa9dab431736bc4d38bb5febb649cc1c8e7",
+  "environment": {
+    "development": "fresh native Linux venv; official PyPI; --no-cache-dir",
+    "development_transitives": "resolved at run time, not locked",
+    "runtime": "fresh native Linux venv; final wheel; --no-index --no-deps",
+    "runtime_dependencies": [],
+    "global_installs": false
+  },
+  "product_tests": {
+    "count": 32,
+    "development_wheel": "passed",
+    "fresh_installed_wheel_outside_checkout": "passed",
+    "final_installed_wheel_after_mobile_note_fix": "32 passed",
+    "resource_warnings": "treated as errors"
+  },
+  "unchanged_sdk_tests": {
+    "original": 15,
+    "namespaced_copy": 15
+  },
+  "checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "build": "passed",
+    "pip_check": "passed",
+    "installed_readme_flow": "passed",
+    "loopback_port": 8099,
+    "restart_duplicate_count": 2
+  },
+  "example": {
+    "path": "examples/report.html",
+    "generated_by": "final installed CLI",
+    "events": 1,
+    "identical_retries": 1,
+    "accepted_receipts": 2,
+    "raw_payload_in_html": false,
+    "signing_material_in_html": false,
+    "database_path_in_html": false
+  },
+  "source_preservation": {
+    "sdk_snapshot": "unchanged",
+    "sdk_runtime_copy": "unchanged",
+    "source_manifest": "unchanged",
+    "licenses_and_notices": "unchanged",
+    "http_server_and_sqlite_storage": "unchanged"
+  },
+  "github": {
+    "base_run": "https://github.com/skyon0522-ai/signed-webhook-inbox/actions/runs/38060147600",
+    "base_status": "completed/success",
+    "observed_date_jst": "2026-10-15",
+    "local_candidate_remote_run": "not run"
+  },
+  "independent_browser_review": "separate prepublication review; CLI checks do not establish visual quality",
+  "not_performed": [
+    "publication",
+    "customer deployment",
+    "production security validation"
+  ]
+}

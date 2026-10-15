@@ -5,38 +5,58 @@ local integration reference verifies a signed event before writing it to SQLite,
 acknowledges it only after commit, and keeps one immutable payload per event ID.
 An identical retry succeeds; changed bytes under an existing ID return `409`.
 
-The pinned Standard Webhooks 1.1.0 source is copied unchanged into this package
-and executes for verification and signing. This assembly reuses the existing
-inbox extension for HTTP limits, a small JSON contract, durable deduplication,
-and read-only inspection. It is a local integration reference with no external
-runtime dependencies. Its source lineage is recorded in
-[SOURCE_MANIFEST.json](SOURCE_MANIFEST.json).
+![Actual synthetic receipt and retry report](docs/assets/report.png)
 
-[Demo and setup](#try-the-complete-scenario) · [Persistent CLI](#run-a-persistent-inbox) · [Request contract](#request-contract) · [Checks](#verify-the-contracts) · [Source and limits](#design-and-limits)
+[Linux setup and demo](#try-the-complete-scenario-on-linux) · [Persistent CLI](#run-a-persistent-inbox) · [Request contract](#request-contract) · [Checks](#verify-the-contracts) · [Source and limits](#design-and-limits)
 
-The [receiver](src/signed_webhook_inbox/server.py) verifies requests, the
-[storage layer](src/signed_webhook_inbox/storage.py) commits or deduplicates them,
-and the [CLI](src/signed_webhook_inbox/cli.py) runs the demo and local server.
-See [architecture](docs/architecture.md), [source provenance](REFERENCES.md),
-[tests](tests/) and [verification](VERIFICATION.md) for the corresponding boundaries.
+## Try the complete scenario on Linux
 
-## Try the complete scenario
-
-Python 3.11 or newer and SQLite 3.37 or newer are required. The [verification record](docs/verification.json)
-records the exact tested runtime. In a fresh checkout:
+There are no third-party runtime dependencies. Python 3.11 or newer and SQLite
+3.37 or newer are required. The current Linux
+walkthrough was tested on Ubuntu 24.04 under WSL2, Python 3.12.3 and SQLite
+3.45.1. [Linux verification](docs/linux-verification.json) records the local
+checks separately from the earlier source-composition record. From a fresh
+checkout, install into a local virtual environment:
 
 ```sh
-python -m venv .venv
-# POSIX / WSL:
-.venv/bin/python -m pip install .
-.venv/bin/python -m signed_webhook_inbox demo
-# Windows PowerShell: use .venv\Scripts\python.exe for the same commands.
+python3.12 -I -m venv .venv
+.venv/bin/python -I -m pip install .
+.venv/bin/python -I -m pip check
+INBOX_CLI="$(pwd)/.venv/bin/signed-webhook-inbox"
+INBOX_PYTHON="$(pwd)/.venv/bin/python"
+```
+
+Run the installed command from a separate working directory. The demo does not
+need an account, a configured secret, a checkout-relative fixture or an external
+service:
+
+```sh
+DEMO_WORKDIR="$(mktemp -d)"
+cd "$DEMO_WORKDIR"
+"$INBOX_CLI" demo --output-dir demo-review
+"$INBOX_CLI" inspect --db demo-review/inbox.sqlite3
+"$INBOX_CLI" report --db demo-review/inbox.sqlite3 --html second-review.html
 ```
 
 The demo starts its own server on `127.0.0.1` with an OS-assigned port, sends
-five requests, reads the database, and removes its temporary database on exit.
-Its fixture and outcome lines are deterministic; each run signs fresh timestamps.
-Actual output is recorded in [docs/example-output.txt](docs/example-output.txt).
+five requests, then stops the server. Open `demo-review/report.html` in a browser
+to review the event, hash and retry count. See an [actual synthetic report](examples/report.html)
+without running the CLI. Nothing opens a browser automatically.
+
+| Retained file | Use |
+| --- | --- |
+| `inbox.sqlite3` | Inspect or restart the synthetic inbox. Contains its one raw synthetic payload. |
+| `invoice-paid.json` | Reuse the exact synthetic body with `send`; included by the installed demo. |
+| `inspect.json` | Metadata snapshot with one stored event and one identical retry. |
+| `report.html` | Self-contained offline metadata view; no raw payload or signing material. |
+| `outcomes.txt` | The five observed HTTP outcomes and deterministic summary below. |
+
+`--output-dir` must name a new directory whose parent exists. Existing directories
+and report files are never overwritten; choose a new name for another run.
+Running `"$INBOX_CLI" demo` without flags preserves the original temporary demo:
+it prints the same outcome lines and removes its temporary database on exit.
+Timestamps refresh on each run; hashes and the outcome lines remain the same.
+Actual output is also recorded in [docs/example-output.txt](docs/example-output.txt).
 
 ```text
 valid: 200 stored
@@ -52,34 +72,49 @@ sha256: 1858de5efce540080ac8d1bff5d7d72501b0c8222ebd4573328de36d095f879b
 ## Run a persistent inbox
 
 Create a new random key locally and keep it in the environment. The key must use
-the `whsec_` prefix followed by padded Base64 for 24–64 random bytes.
+the `whsec_` prefix followed by padded Base64 for 24–64 random bytes. Continue
+in the same Linux shell after the demo. Start the server in the background:
 
 ```sh
-export WEBHOOK_SECRET="$(.venv/bin/python -c 'import base64,secrets; print("whsec_"+base64.b64encode(secrets.token_bytes(32)).decode())')"
-.venv/bin/python -m signed_webhook_inbox serve --db inbox.sqlite3 --port 8099
+export WEBHOOK_SECRET="$("$INBOX_PYTHON" -c 'import base64,secrets; print("whsec_"+base64.b64encode(secrets.token_bytes(32)).decode())')"
+"$INBOX_CLI" serve --db inbox.sqlite3 --port 8099 &
+INBOX_PID=$!
 ```
 
-PowerShell key generation and startup:
-
-```powershell
-$env:WEBHOOK_SECRET = .venv\Scripts\python.exe -c 'import base64,secrets; print("whsec_"+base64.b64encode(secrets.token_bytes(32)).decode())'
-.venv\Scripts\python.exe -m signed_webhook_inbox serve --db inbox.sqlite3 --port 8099
-```
-
-In a second terminal with the same `WEBHOOK_SECRET`, send the fixture twice:
+Wait for `listening: http://127.0.0.1:8099/webhooks`, then send the retained
+synthetic fixture twice from the same shell. Both commands inherit the same key:
 
 ```sh
-.venv/bin/python -m signed_webhook_inbox send --id msg_invoice_042 --payload-file examples/invoice-paid.json
-.venv/bin/python -m signed_webhook_inbox send --id msg_invoice_042 --payload-file examples/invoice-paid.json
-.venv/bin/python -m signed_webhook_inbox inspect --db inbox.sqlite3
+"$INBOX_CLI" send --id msg_invoice_042 --payload-file demo-review/invoice-paid.json
+"$INBOX_CLI" send --id msg_invoice_042 --payload-file demo-review/invoice-paid.json
+"$INBOX_CLI" inspect --db inbox.sqlite3
+"$INBOX_CLI" report --db inbox.sqlite3 --html inbox-review.html
 ```
 
 The sender prints `{"status":200,"result":"stored"}` followed by
 `{"status":200,"result":"duplicate"}`. `inspect` prints JSON with one event,
 its original payload hash, byte count, receipt metadata, and `duplicate_count: 1`.
-It opens SQLite in read-only mode and fails if the file does not exist.
-`Ctrl+C` stops the server; restarting with the same database keeps event IDs.
-The server and sender expose no host or remote URL option and use only loopback.
+`report` reads the same metadata and writes a new HTML snapshot. Neither command
+needs the signing key, changes stored events or creates a missing database.
+The report omits raw bodies, signatures, secrets and database paths. Event IDs
+and types can still be sensitive; review metadata before sharing.
+
+Stop the background server after the requests finish:
+
+```sh
+kill "$INBOX_PID"
+wait "$INBOX_PID" || true
+unset WEBHOOK_SECRET
+```
+
+`kill` stops this background process; a foreground `serve` can be stopped with
+`Ctrl+C`. Restarting with the same database keeps event IDs, even after a new
+local key is configured. Retrying an existing ID still requires the exact original
+body bytes. The server and sender use only loopback; there is no remote URL option.
+
+For your own synthetic event, replace `--payload-file` with a local JSON file
+matching the contract below. Use a separate database and key for any adaptation;
+the retained demo database and fixture are examples.
 
 ## Request contract
 
@@ -124,18 +159,25 @@ This endpoint accepts `webhook-*` headers, not Svix's legacy `svix-*` aliases.
 ## Verify the contracts
 
 ```sh
+.venv/bin/python -I -m pip install '.[dev]'
 .venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python tools/source_contract.py original
+.venv/bin/python tools/source_contract.py copy
 .venv/bin/python -m ruff check .
 .venv/bin/python -m ruff format --check .
 .venv/bin/python -m build
 ```
 
-Install `.[dev]` to run development checks. The suite uses real loopback HTTP for valid, tampered, stale, malformed,
+Run these commands from the checkout. The suite uses real loopback HTTP for valid, tampered, stale, malformed,
 duplicate, conflict, framing, deadline, and parallel-race cases. It exercises
 real SQLite locks and trigger failures, injects a commit failure, and terminates
 and restarts a CLI server process to check persistence. The demo is executed
-twice to compare printed outcomes. CI uses pinned action commits and dependencies.
-It has not been executed on GitHub. The unchanged upstream SDK tests can be run
+twice to compare printed outcomes. Additional checks cover HTML escaping,
+read-only failure for a missing database, retained outputs from another working
+directory and refusal to overwrite existing output. CI uses pinned action commits
+and dependencies. The [base revision's contracts run](https://github.com/skyon0522-ai/signed-webhook-inbox/actions/runs/38060147600)
+passed at `a1e2cfa9dab431736bc4d38bb5febb649cc1c8e7`; this local candidate has
+not run on GitHub. The unchanged upstream SDK tests can be run
 against the source snapshot or the local copy with the receipt runner documented
 in [REFERENCES.md](REFERENCES.md). The original-to-copy comparison and installed
 wheel execution evidence are summarized in [VERIFICATION.md](VERIFICATION.md)
@@ -143,10 +185,23 @@ and [docs/verification.json](docs/verification.json).
 
 ## Design and limits
 
+The pinned Standard Webhooks 1.1.0 source is copied unchanged into this package
+and executes for verification and signing. This assembly reuses the existing
+inbox extension for HTTP limits, a small JSON contract, durable deduplication,
+and read-only inspection. Its source lineage is recorded in
+[SOURCE_MANIFEST.json](SOURCE_MANIFEST.json).
+
+The [receiver](src/signed_webhook_inbox/server.py) verifies requests, the
+[storage layer](src/signed_webhook_inbox/storage.py) commits or deduplicates them,
+and the [CLI](src/signed_webhook_inbox/cli.py) runs the demo and local server.
+See [architecture](docs/architecture.md), [source provenance](REFERENCES.md),
+[tests](tests/) and [verification](VERIFICATION.md) for the corresponding boundaries.
+
 See [architecture](docs/architecture.md), [reference provenance](REFERENCES.md),
 and [third-party notices](THIRD_PARTY_NOTICES.md). Each ID represents one stored
-event, not exactly-once execution of business side effects. There is no consumer,
-queue, delivery service, dashboard, key rotation manager, or remote integration.
+event, not exactly-once execution of business side effects. The HTML report is
+a static receipt snapshot. There is no consumer, queue, delivery service, live
+dashboard, key rotation manager, or remote integration.
 
 SQLite uses WAL and `synchronous=FULL`; actual crash durability still depends on
 the filesystem and hardware honoring synchronization. Keep the database and its
